@@ -1,7 +1,6 @@
 import java.net.*;
-
 import javax.print.attribute.standard.RequestingUserName;
-
+import java.util.*;
 import java.io.*;
 
 
@@ -24,26 +23,75 @@ public class proxy {
         in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         String url = in.readLine();
         System.out.println(url);
-        out.println("ACK");
+        //out.println("ACK");
 
         //determine http or https
         if(url.matches("https.*")) {
-            requestHttps();
+            out.println(requestHttps(url));
         }
         else if(url.matches("http.*")) {
-            requestHttp();
+            out.println(requestHttp(url));
         }
         else {
             System.out.println("Bad URL");
         }
     }
 
-    public static void requestHttps() {
+    public static String requestHttps(String url) throws Exception {
         System.out.println("HTTPS Case");
+        return "s";
     }
 
-    public static void requestHttp() {
-        System.out.println("HTTP Case");
+    public static String requestHttp(String urlS) throws Exception {
+        URL url = new URL (urlS);
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("GET");
+        System.out.println("Printing URL: " + url);
+        System.out.println("Printing CON: " + con);
+
+        //Handling Redirects
+        con.setInstanceFollowRedirects(true);
+        return getFullResponse(con);
+    }
+
+    public static String getFullResponse(HttpURLConnection con) throws IOException {
+        StringBuilder fullResponseBuilder = new StringBuilder();
+
+        //Reading Response Status Info 
+        fullResponseBuilder.append(con.getResponseCode())
+            .append(" ")
+            .append(con.getResponseMessage())
+            .append("\n");
+
+        //Reading Headers
+
+        con.getHeaderFields().entrySet().stream()
+            .filter(entry -> entry.getKey() != null)
+            .forEach(entry -> {
+                fullResponseBuilder.append(entry.getKey()).append(": ");
+                List headerValues = entry.getValue();
+                Iterator it = headerValues.iterator();
+                if (it.hasNext()) {
+                    fullResponseBuilder.append(it.next());
+                    while (it.hasNext()) {
+                        fullResponseBuilder.append(", ").append(it.next());
+                    }
+                }
+                fullResponseBuilder.append("\n");
+            });
+
+        //getting response Content
+
+        BufferedReader in = new BufferedReader(
+        new InputStreamReader(con.getInputStream()));
+        String inputLine;
+        StringBuffer content = new StringBuffer();
+        while ((inputLine = in.readLine()) != null) {
+            content.append(inputLine);
+        }
+        in.close();
+        fullResponseBuilder.append(content);
+        return fullResponseBuilder.toString();
     }
 
     public void stop() throws Exception {

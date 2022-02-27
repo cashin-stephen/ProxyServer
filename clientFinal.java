@@ -1,6 +1,7 @@
 import java.net.*;
 import java.util.*;
 import java.io.*;
+import java.util.concurrent.TimeUnit;
 
 public class clientFinal {
     private Socket clientSocket;
@@ -18,9 +19,15 @@ public class clientFinal {
     public String sendURL(String url) throws Exception {
         startConnection("127.0.0.1", 5000);
         out.println(url);
-        String resp = in.readLine();
+        String resp;
+        StringBuffer sb = new StringBuffer();
+        while((resp = in.readLine()) != null){
+            sb.append(resp);
+            System.out.print(resp);
+            TimeUnit.SECONDS.sleep(1);
+        }
         stopConnection();
-        return resp;
+        return sb.toString();
     }
 
 
