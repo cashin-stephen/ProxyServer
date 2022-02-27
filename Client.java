@@ -13,8 +13,8 @@ public class Client {
     }
 
     public String sendMessage(String msg) throws Exception {
-        //out.println(msg);
-        String resp = msg;
+        out.println(msg);
+        String resp = in.readLine();
         return resp;
     }
 
