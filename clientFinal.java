@@ -22,8 +22,8 @@ public class clientFinal {
         String resp;
         StringBuffer sb = new StringBuffer();
         while((resp = in.readLine()) != null){
-            sb.append(resp);
-            System.out.print(resp);
+            sb.append(resp + " \n");
+            //System.out.println(resp);
             //TimeUnit.SECONDS.sleep(1);
         }
         stopConnection();

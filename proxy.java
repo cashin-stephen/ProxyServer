@@ -1,7 +1,8 @@
 import java.net.*;
-import javax.print.attribute.standard.RequestingUserName;
 import java.util.*;
 import java.io.*;
+import javax.net.ssl.HttpsURLConnection;
+import java.security.cert.Certificate;
 
 
 public class proxy {
@@ -48,9 +49,23 @@ public class proxy {
         }
     }
 
-    public static String requestHttps(String url) throws Exception {
+    public void stop() throws Exception {
+        mcIn.close();
+        mcOut.close();
+        clientIn.close();
+        clientOut.close();
+        clientSocket.close();
+        serverSocket.close();
+    }
+
+    public static String requestHttps(String urlS) throws Exception {
         System.out.println("HTTPS Case");
-        return "s";
+        URL url = new URL (urlS);
+        HttpsURLConnection con = (HttpsURLConnection)url.openConnection();
+        con.setRequestMethod("GET");
+        System.out.println("Printing URL: " + url);
+        System.out.println("Printing CON: " + con);
+        return getFullResponse(con);
     }
 
     public static String requestHttp(String urlS) throws Exception {
@@ -99,19 +114,46 @@ public class proxy {
         StringBuffer content = new StringBuffer();
         while ((inputLine = in.readLine()) != null) {
             content.append(inputLine);
+            content.append('\n');
         }
         in.close();
         fullResponseBuilder.append(content);
         return fullResponseBuilder.toString();
     }
 
-    public void stop() throws Exception {
-        mcIn.close();
-        mcOut.close();
-        clientIn.close();
-        clientOut.close();
-        clientSocket.close();
-        serverSocket.close();
+    private static String getFullResponse(HttpsURLConnection con) throws Exception{
+        StringBuilder fullResponseBuilder = new StringBuilder();
+
+        //getting https Certs
+        fullResponseBuilder.append("Response Code : " + con.getResponseCode());
+        fullResponseBuilder.append("Cipher Suite : " + con.getCipherSuite());
+        fullResponseBuilder.append("\n");
+                    
+        Certificate[] certs = con.getServerCertificates();
+        for(Certificate cert : certs){
+            fullResponseBuilder.append("Cert Type : " + cert.getType()+ '\n');
+            fullResponseBuilder.append("Cert Hash Code : " + cert.hashCode()+ '\n');
+            fullResponseBuilder.append("Cert Public Key Algorithm : " 
+                                        + cert.getPublicKey().getAlgorithm()+ '\n');
+            fullResponseBuilder.append("Cert Public Key Format : " 
+                                        + cert.getPublicKey().getFormat()+ '\n');
+            fullResponseBuilder.append('\n');
+        }
+
+        //getting Content
+        BufferedReader in = new BufferedReader(
+        new InputStreamReader(con.getInputStream()));
+        String inputLine;
+        StringBuffer content = new StringBuffer();
+        while ((inputLine = in.readLine()) != null) {
+            content.append(inputLine);
+            content.append("\n");
+        }
+        in.close();
+        fullResponseBuilder.append(content);
+        return fullResponseBuilder.toString();
     }
+        
+        
 
 }
