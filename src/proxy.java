@@ -14,6 +14,8 @@ public class proxy {
     private BufferedReader clientIn;    // All Communication from the Client
     private PrintWriter mcOut;          // All Communication to the Management Console
     private BufferedReader mcIn;        // All Communication from the Management Console
+    private HashMap<String, String> cache = new HashMap<String,String>();
+
     public static void main(String[] args) throws Exception{
         System.out.println("Awaiting Connection");
         proxy server = new proxy();
@@ -35,17 +37,28 @@ public class proxy {
             //Send request to the Management Console
             mcOut.println(url);
             Boolean valid = Boolean.parseBoolean(mcIn.readLine());
-            System.out.println(valid);
-            //determine http or https
+            //System.out.println(valid);
+
+            //determine validity
             if(valid == false) {
                 System.out.println("Selected URL Blocked");
             }
+            //check cache, invalid & bad urls will never be cached
+            else if(cache.containsKey(url)) {
+                System.out.println("cache match");
+                clientOut.println(cache.get(url));
+            }
 
+            //determine http or https or Bad URL
             else if(url.matches("https.*")) {
-                clientOut.println(requestHttps(url));
+                String req = requestHttps(url);
+                cache.put(url, req);
+                clientOut.println(req);
             }
             else if(url.matches("http.*")) {
-                clientOut.println(requestHttp(url));
+                String req = requestHttp(url);
+                cache.put(url, req);
+                clientOut.println(req);
             }
             else {
                 System.out.println("Bad URL");
