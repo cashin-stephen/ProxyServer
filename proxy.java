@@ -6,10 +6,13 @@ import java.io.*;
 
 public class proxy {
 
-    private ServerSocket serverSocket;
-    private Socket clientSocket;
-    private PrintWriter out;
-    private BufferedReader in;
+    private ServerSocket serverSocket;  // Socket for the proxy server
+    private Socket clientSocket;        // socket for the Client
+    private Socket mcSocket;            // Socket for the Management Console
+    private PrintWriter clientOut;      // All Communication to the Client
+    private BufferedReader clientIn;    // All Communication from the Client
+    private PrintWriter mcOut;          // All Communication to the Management Console
+    private BufferedReader mcIn;        // All Communication from the Management Console
     public static void main(String[] args) throws Exception{
         System.out.println("Awaiting Connection");
         proxy server = new proxy();
@@ -19,18 +22,23 @@ public class proxy {
     public void start(int port) throws Exception{
         serverSocket = new ServerSocket(port);
         clientSocket = serverSocket.accept();
-        out = new PrintWriter(clientSocket.getOutputStream(), true);
-        in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-        String url = in.readLine();
+        mcSocket = new Socket("127.0.0.1", 5002);
+        mcOut = new PrintWriter(mcSocket.getOutputStream(), true);
+        clientIn = new BufferedReader(new InputStreamReader(mcSocket.getInputStream()));
+        clientOut = new PrintWriter(clientSocket.getOutputStream(), true);
+        clientIn = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+        String url = clientIn.readLine();
         System.out.println(url);
-        //out.println("ACK");
+
+        //Send request to the Management Console
+        mcOut.println(url);
 
         //determine http or https
         if(url.matches("https.*")) {
-            out.println(requestHttps(url));
+            clientOut.println(requestHttps(url));
         }
         else if(url.matches("http.*")) {
-            out.println(requestHttp(url));
+            clientOut.println(requestHttp(url));
         }
         else {
             System.out.println("Bad URL");
@@ -95,8 +103,10 @@ public class proxy {
     }
 
     public void stop() throws Exception {
-        in.close();
-        out.close();
+        mcIn.close();
+        mcOut.close();
+        clientIn.close();
+        clientOut.close();
         clientSocket.close();
         serverSocket.close();
     }
