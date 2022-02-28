@@ -20,28 +20,31 @@ public class proxy {
     }
 
     public void start(int port) throws Exception{
-        serverSocket = new ServerSocket(port);
-        clientSocket = serverSocket.accept();
-        mcSocket = new Socket("127.0.0.1", 5002);
-        mcOut = new PrintWriter(mcSocket.getOutputStream(), true);
-        clientIn = new BufferedReader(new InputStreamReader(mcSocket.getInputStream()));
-        clientOut = new PrintWriter(clientSocket.getOutputStream(), true);
-        clientIn = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-        String url = clientIn.readLine();
-        System.out.println(url);
+         while(true) {
+            serverSocket = new ServerSocket(port);
+            clientSocket = serverSocket.accept();
+            mcSocket = new Socket("127.0.0.1", 5002);
+            mcOut = new PrintWriter(mcSocket.getOutputStream(), true);
+            mcIn = new BufferedReader(new InputStreamReader(mcSocket.getInputStream()));
+            clientOut = new PrintWriter(clientSocket.getOutputStream(), true);
+            clientIn = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            String url = clientIn.readLine();
+            System.out.println(url);
 
-        //Send request to the Management Console
-        mcOut.println(url);
+            //Send request to the Management Console
+            mcOut.println(url);
 
-        //determine http or https
-        if(url.matches("https.*")) {
-            clientOut.println(requestHttps(url));
-        }
-        else if(url.matches("http.*")) {
-            clientOut.println(requestHttp(url));
-        }
-        else {
-            System.out.println("Bad URL");
+            //determine http or https
+            if(url.matches("https.*")) {
+                clientOut.println(requestHttps(url));
+            }
+            else if(url.matches("http.*")) {
+                clientOut.println(requestHttp(url));
+            }
+            else {
+                System.out.println("Bad URL");
+            }
+            stop();
         }
     }
 

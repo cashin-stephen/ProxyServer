@@ -24,7 +24,7 @@ public class clientFinal {
         while((resp = in.readLine()) != null){
             sb.append(resp);
             System.out.print(resp);
-            TimeUnit.SECONDS.sleep(1);
+            //TimeUnit.SECONDS.sleep(1);
         }
         stopConnection();
         return sb.toString();

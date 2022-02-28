@@ -27,11 +27,21 @@ public class mConsole {
     }
 
     public void start(int port) throws Exception {
-        serverSocket = new ServerSocket(port);
-        clientSocket = serverSocket.accept();
-        out = new PrintWriter(clientSocket.getOutputStream(), true);
-        in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-        String url = in.readLine();
-        System.out.println("Handling Request for " + url);
+        while (true) {
+            serverSocket = new ServerSocket(port);
+            clientSocket = serverSocket.accept();
+            out = new PrintWriter(clientSocket.getOutputStream(), true);
+            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            String url = in.readLine();
+            System.out.println("Handling Request for " + url);
+            stop();
+        }
+    }
+
+    public void stop() throws Exception {
+        in.close();
+        out.close();
+        clientSocket.close();
+        serverSocket.close();
     }
 }
