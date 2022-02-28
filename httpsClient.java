@@ -15,7 +15,7 @@ public class httpsClient{
 	
    private void testIt(){
 
-      String https_url = "http://www.google.com/";
+      String https_url = "https://www.google.com/";
       URL url;
       try {
 

@@ -20,7 +20,7 @@ public class mConsole {
 
     public static Boolean checkBlackList(String url) {
         for(int i=0; i<blackList.size(); i++) {
-            if(url.equals(blackList.get(i)) || url.contains(blackList.get(i)))
+            if(url.contains(blackList.get(i)))
                 return false;
         }
         return true;
@@ -33,6 +33,7 @@ public class mConsole {
             out = new PrintWriter(clientSocket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             String url = in.readLine();
+            out.println(checkBlackList(url));
             System.out.println("Handling Request for " + url);
             stop();
         }

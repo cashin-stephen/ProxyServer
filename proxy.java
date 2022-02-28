@@ -34,9 +34,14 @@ public class proxy {
 
             //Send request to the Management Console
             mcOut.println(url);
-
+            Boolean valid = Boolean.parseBoolean(mcIn.readLine());
+            System.out.println(valid);
             //determine http or https
-            if(url.matches("https.*")) {
+            if(valid == false) {
+                System.out.println("Selected URL Blocked");
+            }
+
+            else if(url.matches("https.*")) {
                 clientOut.println(requestHttps(url));
             }
             else if(url.matches("http.*")) {
@@ -65,6 +70,7 @@ public class proxy {
         con.setRequestMethod("GET");
         System.out.println("Printing URL: " + url);
         System.out.println("Printing CON: " + con);
+        con.setInstanceFollowRedirects(true);
         return getFullResponse(con);
     }
 
