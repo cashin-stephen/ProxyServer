@@ -1,7 +1,8 @@
-import java.net.*;
-import java.util.*;
-import java.io.*;
-import java.util.concurrent.TimeUnit;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
+import java.util.Scanner;
 
 public class clientFinal {
     private Socket clientSocket;
