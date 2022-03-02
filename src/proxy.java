@@ -3,6 +3,7 @@ import java.util.*;
 import java.io.*;
 import javax.net.ssl.HttpsURLConnection;
 import java.security.cert.Certificate;
+import java.util.concurrent.TimeUnit;
 
 
 public class proxy {
@@ -15,17 +16,22 @@ public class proxy {
     private PrintWriter mcOut;          // All Communication to the Management Console
     private BufferedReader mcIn;        // All Communication from the Management Console
     private HashMap<String, String> cache = new HashMap<String,String>();
-
+ 
     public static void main(String[] args) throws Exception{
         System.out.println("Awaiting Connection");
         proxy server = new proxy();
-        server.start(5000);
+        server.startServer(5000);
     }
 
-    public void start(int port) throws Exception{
-         while(true) {
-            serverSocket = new ServerSocket(port);
+    public void startServer(int port) throws Exception{
+         
+        serverSocket = new ServerSocket(port);
+        serverSocket.setReuseAddress(true);
+        while(true) {
             clientSocket = serverSocket.accept();
+            //Make Client Handler HERE
+            //NEW THREAD
+            //TimeUnit.SECONDS.sleep(20);
             mcSocket = new Socket("127.0.0.1", 5002);
             mcOut = new PrintWriter(mcSocket.getOutputStream(), true);
             mcIn = new BufferedReader(new InputStreamReader(mcSocket.getInputStream()));
@@ -63,7 +69,7 @@ public class proxy {
             else {
                 System.out.println("Bad URL");
             }
-            stop();
+            clientSocket.close();
         }
     }
 
