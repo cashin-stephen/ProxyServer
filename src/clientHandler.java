@@ -1,9 +1,16 @@
-import java.net.*;
-import java.io.*;
-import java.util.*;
-import javax.net.ssl.HttpsURLConnection;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.HttpURLConnection;
+import java.net.Socket;
+import java.net.URL;
 import java.security.cert.Certificate;
-import java.util.concurrent.TimeUnit;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.net.ssl.HttpsURLConnection;
 
 public class clientHandler implements Runnable {
 
@@ -33,7 +40,6 @@ public class clientHandler implements Runnable {
 
     public void run() {
         try {
-            TimeUnit.SECONDS.sleep(20);
             mcSocket = new Socket("127.0.0.1", 5002);
             mcOut = new PrintWriter(mcSocket.getOutputStream(), true);
             mcIn = new BufferedReader(new InputStreamReader(mcSocket.getInputStream()));
@@ -47,9 +53,10 @@ public class clientHandler implements Runnable {
             Boolean valid = Boolean.parseBoolean(mcIn.readLine());
             //System.out.println(valid);
 
-            //determine validity
+            //determine validity against blackList
             if(valid == false) {
                 System.out.println("Selected URL Blocked");
+                clientOut.println("Selected URL blocked");
             }
             //check cache, invalid & bad urls will never be cached
             else if(cache.containsKey(url)) {
@@ -74,13 +81,6 @@ public class clientHandler implements Runnable {
             clientSocket.close();
         } catch(Exception e) {System.out.println("error occurred" + "/n" + e);}
         
-    }
-
-    public void stop() throws Exception {
-        mcIn.close();
-        mcOut.close();
-        clientIn.close();
-        clientOut.close();
     }
 
     public static String requestHttps(String urlS) throws Exception {

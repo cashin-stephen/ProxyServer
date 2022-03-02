@@ -1,7 +1,6 @@
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
-import java.util.Map;
 
 public class proxy {
 
@@ -20,9 +19,6 @@ public class proxy {
         serverSocket = new ServerSocket(port);
         serverSocket.setReuseAddress(true);
         while(true) {
-            for (Map.Entry<String, String> entry : cache.entrySet()) {
-                System.out.println(entry.getKey() + ": " + entry.getValue());
-            }
             clientSocket = serverSocket.accept();
             clientHandler clientSock = new clientHandler(clientSocket, cache);
             new Thread(clientSock).start();

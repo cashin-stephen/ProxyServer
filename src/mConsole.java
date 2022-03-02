@@ -1,13 +1,12 @@
-import java.net.*;
-import java.util.*;
-import java.io.*;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 public class mConsole {
 
     private ServerSocket serverSocket;
     private Socket clientSocket;
-    private PrintWriter out;
-    private BufferedReader in;
     private static List<String> blackList = new ArrayList<String>();
     public static void main(String[] args) throws Exception {
         System.out.println("Starting Management Console");
@@ -18,31 +17,15 @@ public class mConsole {
         mc.start(5002);
     }
 
-    public static Boolean checkBlackList(String url) {
-        for(int i=0; i<blackList.size(); i++) {
-            if(url.contains(blackList.get(i)))
-                return false;
-        }
-        return true;
-    }
-
     public void start(int port) throws Exception {
+        serverSocket = new ServerSocket(port);
+        serverSocket.setReuseAddress(true);
         while (true) {
-            serverSocket = new ServerSocket(port);
             clientSocket = serverSocket.accept();
-            out = new PrintWriter(clientSocket.getOutputStream(), true);
-            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            String url = in.readLine();
-            out.println(checkBlackList(url));
-            System.out.println("Handling Request for " + url);
-            stop();
+            verificationHandler consoleSock = new verificationHandler(clientSocket, blackList);
+            new Thread(consoleSock).start();
+            //clientSocket.close();
         }
     }
 
-    public void stop() throws Exception {
-        in.close();
-        out.close();
-        clientSocket.close();
-        serverSocket.close();
-    }
 }
