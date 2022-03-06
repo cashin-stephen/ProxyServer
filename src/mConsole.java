@@ -10,9 +10,13 @@ public class mConsole {
     private static List<String> blackList = new ArrayList<String>();
     public static void main(String[] args) throws Exception {
         System.out.println("Starting Management Console");
+
+        //add values to blacklist
         blackList.add("facebook.com");
         blackList.add("instagram.com");
         blackList.add("twittter.com");
+
+        //start the management Console up
         mConsole mc = new mConsole();
         mc.start(5002);
     }

@@ -30,6 +30,7 @@ public class clientHandler implements Runnable {
     }
 
     public HashMap<String, String> start () {
+        // Starting a thread if the current thread is null
         System.out.println("Starting " +  threadName );
         if (t == null) {
            t = new Thread (this, threadName);
@@ -40,11 +41,16 @@ public class clientHandler implements Runnable {
 
     public void run() {
         try {
+            //setting up connection to the management console with associated conmmication channels
             mcSocket = new Socket("127.0.0.1", 5002);
             mcOut = new PrintWriter(mcSocket.getOutputStream(), true);
             mcIn = new BufferedReader(new InputStreamReader(mcSocket.getInputStream()));
+
+            //Setting up communication channels with client
             clientOut = new PrintWriter(clientSocket.getOutputStream(), true);
             clientIn = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+
+            //get Url from client
             String url = clientIn.readLine();
             System.out.println(url);
 
@@ -84,9 +90,13 @@ public class clientHandler implements Runnable {
     }
 
     public static String requestHttps(String urlS) throws Exception {
-        System.out.println("HTTPS Case");
+
         URL url = new URL (urlS);
+
+        //set up HTTPS connection
         HttpsURLConnection con = (HttpsURLConnection)url.openConnection();
+
+        //set GET method
         con.setRequestMethod("GET");
         System.out.println("Printing URL: " + url);
         System.out.println("Printing CON: " + con);
@@ -95,8 +105,13 @@ public class clientHandler implements Runnable {
     }
 
     public static String requestHttp(String urlS) throws Exception {
+
         URL url = new URL (urlS);
+
+        //set up HTTPS connection
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
+
+        //set GET method
         con.setRequestMethod("GET");
         System.out.println("Printing URL: " + url);
         System.out.println("Printing CON: " + con);
@@ -106,6 +121,7 @@ public class clientHandler implements Runnable {
         return getFullResponse(con);
     }
 
+    // method for formatting HTTP return value with response status headers and the content
     public static String getFullResponse(HttpURLConnection con) throws IOException {
         StringBuilder fullResponseBuilder = new StringBuilder();
 
@@ -147,6 +163,7 @@ public class clientHandler implements Runnable {
         return fullResponseBuilder.toString();
     }
 
+    // method for formatting HTTPs return value with HTTPS certs and the content
     private static String getFullResponse(HttpsURLConnection con) throws Exception{
         StringBuilder fullResponseBuilder = new StringBuilder();
 
